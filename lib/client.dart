@@ -221,7 +221,7 @@ class EventFlux extends EventFluxBase {
             },
             cancelOnError: true,
             onDone: () async {
-              _stop();
+              await _stop();
               eventFluxLog('Stream Closed', LogEvent.info);
 
               /// When the stream is closed, onClose can be called to execute a function.
@@ -240,7 +240,7 @@ class EventFlux extends EventFluxBase {
               );
             },
             onError: (error, s) async {
-              _stop();
+              await _stop();
 
               eventFluxLog(
                   'Data Stream Listen Error: ${data.statusCode}: $error ',
@@ -271,7 +271,7 @@ class EventFlux extends EventFluxBase {
       if (onError != null) {
         onError(EventFluxException(message: e.toString()));
       }
-      _stop();
+      await _stop();
       _reconnectWithDelay(_isExplicitDisconnect, autoReconnect, type, url,
           header, onSuccessCallback,
           onError: onError, onConnectionClose: onConnectionClose, body: body);
@@ -301,9 +301,9 @@ class EventFlux extends EventFluxBase {
   Future<EventFluxStatus> _stop() async {
     eventFluxLog('Disconnecting', LogEvent.info);
     try {
-      _streamController?.close();
+      await _streamController?.close();
       _client?.close();
-      Future.delayed(const Duration(seconds: 1), () {});
+      await Future.delayed(const Duration(seconds: 1), () {});
       eventFluxLog('Disconnected', LogEvent.info);
       return EventFluxStatus.disconnected;
     } catch (error) {
