@@ -25,7 +25,7 @@ class EventFluxUsage extends StatelessWidget {
 
     eventFlux.connect(
         EventFluxConnectionType.get,
-        'http://10.0.2.157:8090/api/sysadmin/sys/common/subscribe?businessMessageType=999?userId=1668893024087506946',
+        'http://10.0.2.157:8090/api/sysadmin/syss/common/subscribe?businessMessageType=999?userId=1668893024087506946',
         header: {"X-TOKEN":"29385bb0f6a24d98a1bb07b44c25b7c6"},
         onSuccessCallback: (EventFluxResponse? response) {
           response?.stream?.listen((data) {

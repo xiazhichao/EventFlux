@@ -24,7 +24,8 @@ class EventFlux extends EventFluxBase {
   Client? _client;
   StreamController<EventFluxData>? _streamController;
   bool _isExplicitDisconnect = false;
-
+  late int _reconnectCount;
+  late int _currentReconnectCount;
   /// Factory method for spawning new instances of `EventFlux`.
   ///
   /// This method creates and returns a new instance of `EventFlux`. It's useful
@@ -110,8 +111,11 @@ class EventFlux extends EventFluxBase {
       bool autoReconnect = false,
       required Function(EventFluxResponse?) onSuccessCallback,
       Function(EventFluxException)? onError,
+      int reconnectCount = 20,
       Map<String, dynamic>? body}) {
     _isExplicitDisconnect = false;
+    _reconnectCount = reconnectCount;
+    _currentReconnectCount = _reconnectCount;
     _start(type, url,
         header: header,
         autoReconnect: autoReconnect,
@@ -162,6 +166,10 @@ class EventFlux extends EventFluxBase {
       eventFluxLog("Status code: ${data.statusCode.toString()}", LogEvent.info);
 
       if (autoReconnect && data.statusCode != 200) {
+        if (_currentReconnectCount < 0) {
+          await disconnect();
+          return;
+        }
         _reconnectWithDelay(
           _isExplicitDisconnect,
           autoReconnect,
@@ -173,9 +181,11 @@ class EventFlux extends EventFluxBase {
           onConnectionClose: onConnectionClose,
           body: body,
         );
+        _currentReconnectCount--;
+        // await Future.delayed(const Duration(seconds: 1), () {});
         return;
       }
-
+      _currentReconnectCount = _reconnectCount;
       ///Applying transforms and listening to it
       data.stream
           .transform(const Utf8Decoder())
