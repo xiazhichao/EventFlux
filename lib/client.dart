@@ -3,7 +3,6 @@ library;
 
 import 'dart:async';
 import 'dart:convert';
-
 import 'package:eventflux/enum.dart';
 import 'package:eventflux/models/base.dart';
 import 'package:eventflux/models/data.dart';
@@ -110,6 +109,7 @@ class EventFlux extends EventFluxBase {
       Function()? onConnectionClose,
       bool autoReconnect = false,
       required Function(EventFluxResponse?) onSuccessCallback,
+        Function()? connectedCallBack,
       Function(EventFluxException)? onError,
       int reconnectCount = 20,
       Map<String, dynamic>? body}) {
@@ -120,6 +120,7 @@ class EventFlux extends EventFluxBase {
         header: header,
         autoReconnect: autoReconnect,
         onSuccessCallback: onSuccessCallback,
+        connectedCallBack: connectedCallBack,
         onError: onError,
         onConnectionClose: onConnectionClose,
         body: body);
@@ -132,6 +133,7 @@ class EventFlux extends EventFluxBase {
       Function()? onConnectionClose,
       bool autoReconnect = false,
       required Function(EventFluxResponse?) onSuccessCallback,
+        Function()? connectedCallBack,
       Function(EventFluxException)? onError,
       Map<String, dynamic>? body}) {
     /// Initalise variables
@@ -185,6 +187,7 @@ class EventFlux extends EventFluxBase {
         // await Future.delayed(const Duration(seconds: 1), () {});
         return;
       }
+      connectedCallBack?.call();
       _currentReconnectCount = _reconnectCount;
       ///Applying transforms and listening to it
       data.stream
@@ -338,6 +341,7 @@ class EventFlux extends EventFluxBase {
       String url,
       Map<String, String> header,
       Function(EventFluxResponse?) onSuccessCallback,
+      Function()? connectedCallBack,
       {Function(EventFluxException)? onError,
       Function()? onConnectionClose,
       Map<String, dynamic>? body}) async {
@@ -349,6 +353,7 @@ class EventFlux extends EventFluxBase {
             onError: onError,
             header: header,
             onConnectionClose: onConnectionClose,
+            connectedCallBack: connectedCallBack,
             body: body);
       });
     }
