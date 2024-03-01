@@ -341,8 +341,8 @@ class EventFlux extends EventFluxBase {
       String url,
       Map<String, String> header,
       Function(EventFluxResponse?) onSuccessCallback,
-      Function()? connectedCallBack,
-      {Function(EventFluxException)? onError,
+      {Function()? connectedCallBack,
+        Function(EventFluxException)? onError,
       Function()? onConnectionClose,
       Map<String, dynamic>? body}) async {
     if (autoReconnect && !isExplicitDisconnect) {
