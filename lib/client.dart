@@ -23,6 +23,9 @@ class EventFlux extends EventFluxBase {
   Client? _client;
   StreamController<EventFluxData>? _streamController;
   bool _isExplicitDisconnect = false;
+  bool get isConnect {
+    return !_isExplicitDisconnect;
+  }
   late int _reconnectCount;
   late int _currentReconnectCount;
   /// Factory method for spawning new instances of `EventFlux`.
