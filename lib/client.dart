@@ -23,9 +23,6 @@ class EventFlux extends EventFluxBase {
   Client? _client;
   StreamController<EventFluxData>? _streamController;
   bool _isExplicitDisconnect = false;
-  bool get isConnect {
-    return !_isExplicitDisconnect;
-  }
   late int _reconnectCount;
   late int _currentReconnectCount;
   /// Factory method for spawning new instances of `EventFlux`.
@@ -201,6 +198,9 @@ class EventFlux extends EventFluxBase {
               if (dataLine.isEmpty) {
                 /// When the data line is empty, it indicates that the complete event set has been read.
                 /// The event is then added to the stream.
+                if(_streamController!.isClosed){
+                  return;
+                }
                 _streamController!.add(currentEventFluxData);
                 currentEventFluxData =
                     EventFluxData(data: '', id: '', event: '');
