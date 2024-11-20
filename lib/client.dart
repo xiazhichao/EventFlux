@@ -16,10 +16,11 @@ import 'package:http/http.dart';
 /// `EventFlux` facilitates the connection, disconnection, and management of SSE streams.
 /// It implements the Singleton pattern to ensure a single instance handles SSE streams throughout the application.
 class EventFlux extends EventFluxBase {
-  EventFlux._();
-  static final EventFlux _instance = EventFlux._();
-
-  static EventFlux get instance => _instance;
+  EventFlux();
+  // EventFlux._();
+  // static final EventFlux _instance = EventFlux._();
+  //
+  // static EventFlux get instance => _instance;
   Client? _client;
   StreamController<EventFluxData>? _streamController;
   bool _isExplicitDisconnect = false;
@@ -48,7 +49,7 @@ class EventFlux extends EventFluxBase {
   /// This method is ideal when distinct, isolated instances of `EventFlux` are required,
   /// offering more control over multiple SSE connections.
   static EventFlux spawn() {
-    return EventFlux._();
+    return EventFlux();
   }
 
   /// Establishes a connection to a server-sent event (SSE) stream.
@@ -183,12 +184,10 @@ class EventFlux extends EventFluxBase {
           onConnectionClose: onConnectionClose,
           body: body,
         );
-        _currentReconnectCount--;
         // await Future.delayed(const Duration(seconds: 1), () {});
         return;
       }
       connectedCallBack?.call();
-      _currentReconnectCount = _reconnectCount;
       ///Applying transforms and listening to it
       data.stream
           .transform(const Utf8Decoder())
@@ -220,6 +219,7 @@ class EventFlux extends EventFluxBase {
               } else {
                 value = match.group(2) ?? '';
               }
+              _currentReconnectCount = _reconnectCount;
               switch (field) {
                 case 'event':
                   currentEventFluxData.event = value;
@@ -350,6 +350,7 @@ class EventFlux extends EventFluxBase {
       Map<String, dynamic>? body}) async {
     if (autoReconnect && !isExplicitDisconnect) {
       await Future.delayed(const Duration(seconds: 2), () {
+        _currentReconnectCount--;
         _start(type, url,
             onSuccessCallback: onSuccessCallback,
             autoReconnect: autoReconnect,
