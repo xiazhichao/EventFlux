@@ -306,7 +306,6 @@ class EventFlux extends EventFluxBase {
   /// ```
   @override
   Future<EventFluxStatus> disconnect() async {
-    _isExplicitDisconnect = true;
     return await _stop();
   }
 
@@ -316,6 +315,7 @@ class EventFlux extends EventFluxBase {
   /// This returns the disconnection status enum.
   Future<EventFluxStatus> _stop() async {
     eventFluxLog('Disconnecting', LogEvent.info);
+    _isExplicitDisconnect = true;
     try {
       await _streamController?.close();
       _client?.close();
