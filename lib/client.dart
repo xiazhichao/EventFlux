@@ -348,7 +348,7 @@ class EventFlux extends EventFluxBase {
         Function(EventFluxException)? onError,
       Function()? onConnectionClose,
       Map<String, dynamic>? body}) async {
-    if (autoReconnect && !isExplicitDisconnect) {
+    if (autoReconnect && !isExplicitDisconnect && _currentReconnectCount > 0) {
       await Future.delayed(const Duration(seconds: 2), () {
         _currentReconnectCount--;
         _start(type, url,
