@@ -9,6 +9,7 @@ import 'package:eventflux/models/data.dart';
 import 'package:eventflux/models/exception.dart';
 import 'package:eventflux/models/response.dart';
 import 'package:eventflux/utils.dart';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart';
 
 /// A class for managing event-driven data streams using Server-Sent Events (SSE).
@@ -306,6 +307,7 @@ class EventFlux extends EventFluxBase {
   /// ```
   @override
   Future<EventFluxStatus> disconnect() async {
+    _isExplicitDisconnect = true;
     return await _stop();
   }
 
@@ -315,7 +317,6 @@ class EventFlux extends EventFluxBase {
   /// This returns the disconnection status enum.
   Future<EventFluxStatus> _stop() async {
     eventFluxLog('Disconnecting', LogEvent.info);
-    _isExplicitDisconnect = true;
     try {
       await _streamController?.close();
       _client?.close();
@@ -360,6 +361,17 @@ class EventFlux extends EventFluxBase {
             connectedCallBack: connectedCallBack,
             body: body);
       });
+    } else {
+      if(kDebugMode && _currentReconnectCount < 0) {
+        print("\n");
+        print("\n");
+        print("************");
+        print("$url");
+        print("该地址连接超过 20次  已经完全断开");
+        print("************");
+        print("\n");
+        print("\n");
+      }
     }
   }
 }
