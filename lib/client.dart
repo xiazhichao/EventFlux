@@ -27,6 +27,7 @@ class EventFlux extends EventFluxBase {
   bool _isExplicitDisconnect = false;
   late int _reconnectCount;
   late int _currentReconnectCount;
+  late StreamSubscription _subscription;
   /// Factory method for spawning new instances of `EventFlux`.
   ///
   /// This method creates and returns a new instance of `EventFlux`. It's useful
@@ -190,7 +191,7 @@ class EventFlux extends EventFluxBase {
       }
       connectedCallBack?.call();
       ///Applying transforms and listening to it
-      data.stream
+      _subscription = data.stream
           .transform(const Utf8Decoder())
           .transform(const LineSplitter())
           .listen(
@@ -318,6 +319,7 @@ class EventFlux extends EventFluxBase {
   Future<EventFluxStatus> _stop() async {
     eventFluxLog('Disconnecting', LogEvent.info);
     try {
+      await _subscription.cancel();
       await _streamController?.close();
       _client?.close();
       await Future.delayed(const Duration(seconds: 1), () {});
